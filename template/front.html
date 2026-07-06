@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Finance Coach</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        transition: background 0.5s ease;
+      }
+
+      /* =========================
+         THEMES
+      ========================= */
+
+      .dark-mode {
+        background: linear-gradient(
+          135deg,
+          #1e1b4b 0%,
+          #312e81 100%
+        ) !important;
+      }
+
+      .light-mode {
+        background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+      }
+
+      /* =========================
+         GLASS EFFECT
+      ========================= */
+
+      .glass-panel {
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        transition: all 0.3s ease;
+      }
+
+      /* =========================
+         MESSAGE BUBBLES
+      ========================= */
+
+      .message-bubble {
+        max-width: 85%;
+
+        animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+
+        position: relative;
+
+        word-break: break-word;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+
+          transform: translateY(20px) scale(0.95);
+        }
+
+        to {
+          opacity: 1;
+
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      /* BOT MESSAGE */
+
+      .bot-bubble {
+        border-bottom-left-radius: 4px;
+
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .dark .bot-bubble {
+        background: rgba(30, 41, 59, 0.8);
+
+        color: #f1f5f9;
+
+        border-color: rgba(255, 255, 255, 0.1);
+      }
+
+      /* USER MESSAGE */
+
+      .user-bubble {
+        border-bottom-right-radius: 4px;
+
+        background: var(--primary);
+
+        color: white;
+
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      }
+
+      /* =========================
+         TYPING ANIMATION
+      ========================= */
+
+      .typing-dot {
+        width: 8px;
+
+        height: 8px;
+
+        background: #6366f1;
+
+        border-radius: 50%;
+
+        display: inline-block;
+
+        animation: bounce 1.4s infinite ease-in-out;
+      }
+
+      @keyframes bounce {
+        0%,
+        80%,
+        100% {
+          transform: scale(0);
+
+          opacity: 0.3;
+        }
+
+        40% {
+          transform: scale(1);
+
+          opacity: 1;
+        }
+      }
+
+      /* =========================
+         SCROLLBAR
+      ========================= */
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.1);
+
+        border-radius: 10px;
+      }
+
+      .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      /* Hide scrollbar for quick buttons */
+
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+
+      .no-scrollbar {
+        scrollbar-width: none;
+      }
+
+      /* Disabled Send Button */
+
+      button:disabled {
+        opacity: 0.5;
+
+        cursor: not-allowed;
+      }
+    </style>
+  </head>
+
+  <body
+    class="light-mode h-screen flex items-center justify-center p-0 md:p-6 transition-all duration-500"
+  >
+    <!-- =========================
+         MAIN APPLICATION
+    ========================= -->
+
+    <div
+      id="app-container"
+      class="w-full max-w-4xl h-full md:h-[90vh] glass-panel rounded-none md:rounded-[2rem] shadow-2xl flex flex-col overflow-hidden bg-white/70 dark:bg-slate-900/80"
+    >
+      <!-- =========================
+           HEADER
+      ========================= -->
+
+      <div
+        class="px-6 py-5 flex items-center justify-between border-b border-gray-200 dark:border-white/10"
+      >
+        <!-- LOGO + NAME -->
+
+        <div class="flex items-center gap-4">
+          <div class="relative">
+            <div
+              class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl rotate-3 hover:rotate-0 transition-transform"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-7 w-7"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                />
+              </svg>
+            </div>
+
+            <!-- ONLINE INDICATOR -->
+
+            <span
+              class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white dark:border-slate-800 rounded-full animate-pulse"
+            ></span>
+          </div>
+
+          <div>
+            <h1
+              class="font-bold text-gray-800 dark:text-white text-xl tracking-tight"
+            >
+              Finance Coach
+            </h1>
+
+            <p
+              id="bot-status"
+              class="text-[11px] font-semibold text-indigo-500 dark:text-indigo-400 uppercase tracking-widest"
+            >
+              AI Finance Assistant
+            </p>
+          </div>
+        </div>
+
+        <!-- HEADER BUTTONS -->
+
+        <div class="flex items-center gap-2">
+          <!-- THEME BUTTON -->
+
+          <button
+            type="button"
+            onclick="toggleTheme()"
+            class="p-2.5 rounded-xl bg-gray-100 dark:bg-white/5 text-gray-600 dark:text-gray-300 hover:scale-110 transition-all"
+            title="Switch Theme"
+          >
+            <svg
+              id="theme-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+              />
+            </svg>
+          </button>
+
+          <!-- CLEAR CHAT BUTTON -->
+
+          <button
+            type="button"
+            onclick="clearChat()"
+            class="p-2.5 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-500 hover:scale-110 transition-all"
+            title="Clear Chat"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- =========================
+           CHAT CONTAINER
+      ========================= -->
+
+      <div
+        id="chat-container"
+        class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-white/30 dark:bg-transparent"
+      ></div>
+
+      <!-- =========================
+           TYPING INDICATOR
+      ========================= -->
+
+      <div id="typing-indicator" class="px-8 py-2 hidden">
+        <div class="flex items-center gap-1.5 opacity-60">
+          <span class="typing-dot" style="animation-delay: 0s"></span>
+
+          <span class="typing-dot" style="animation-delay: 0.2s"></span>
+
+          <span class="typing-dot" style="animation-delay: 0.4s"></span>
+
+          <span class="text-xs font-medium dark:text-gray-400 ml-2">
+            Finance Coach is thinking...
+          </span>
+        </div>
+      </div>
+
+      <!-- =========================
+           INPUT AREA
+      ========================= -->
+
+      <div
+        class="p-6 bg-white/80 dark:bg-slate-800/50 border-t border-gray-200 dark:border-white/5"
+      >
+        <!-- FORM -->
+
+        <form id="chat-form" class="relative group">
+          <input
+            type="text"
+            id="user-input"
+            placeholder="Ask your finance question..."
+            class="w-full pl-6 pr-16 py-4 bg-gray-100 dark:bg-white/5 border border-transparent dark:text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-slate-800 transition-all text-sm shadow-inner"
+            autocomplete="off"
+          />
+
+          <!-- SEND BUTTON -->
+
+          <button
+            id="send-button"
+            type="submit"
+            class="absolute right-2 top-2 bottom-2 px-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center group-hover:scale-105"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 rotate-90"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
+              />
+            </svg>
+          </button>
+        </form>
+
+        <!-- =========================
+             QUICK QUESTIONS
+        ========================= -->
+
+        <div class="flex gap-2 mt-4 overflow-x-auto pb-2 no-scrollbar">
+          <button
+            type="button"
+            onclick="fillInput('What is investing?')"
+            class="whitespace-nowrap px-4 py-2 text-xs font-semibold bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 rounded-full text-gray-600 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
+          >
+            📈 Investing
+          </button>
+
+          <button
+            type="button"
+            onclick="fillInput('Explain mutual funds')"
+            class="whitespace-nowrap px-4 py-2 text-xs font-semibold bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 rounded-full text-gray-600 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
+          >
+            💰 Mutual Funds
+          </button>
+
+          <button
+            type="button"
+            onclick="fillInput('What is compound interest?')"
+            class="whitespace-nowrap px-4 py-2 text-xs font-semibold bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 rounded-full text-gray-600 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
+          >
+            🏦 Compound Interest
+          </button>
+
+          <button
+            type="button"
+            onclick="fillInput('How should I create a budget?')"
+            class="whitespace-nowrap px-4 py-2 text-xs font-semibold bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 rounded-full text-gray-600 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all"
+          >
+            📊 Budgeting
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================= -->
+
+    <script>
+      // =========================
+      // GET HTML ELEMENTS
+      // =========================
+
+      const container = document.getElementById("chat-container");
+
+      const inputField = document.getElementById("user-input");
+
+      const typingIndicator = document.getElementById("typing-indicator");
+
+      const chatForm = document.getElementById("chat-form");
+
+      const sendButton = document.getElementById("send-button");
+
+      // =========================
+      // APPLICATION STATE
+      // =========================
+
+      const state = {
+        isDarkMode: localStorage.getItem("zenith_theme") === "dark",
+
+        chatHistory: JSON.parse(localStorage.getItem("zenith_history")) || [],
+      };
+
+      // =========================
+      // FORM SUBMIT EVENT
+      // =========================
+
+      chatForm.addEventListener("submit", handleChatSubmit);
+
+      // =========================
+      // SEND QUESTION TO MODEL
+      // =========================
+
+      async function handleChatSubmit(event) {
+        event.preventDefault();
+
+        const message = inputField.value.trim();
+
+        // Prevent empty messages
+
+        if (!message) {
+          return;
+        }
+
+        // Show user question
+
+        createBubble(message, "user");
+
+        // Clear input
+
+        inputField.value = "";
+
+        // Disable input while waiting
+
+        setLoading(true);
+
+        // Create FormData
+
+        const formData = new FormData();
+
+        /*
+          Flask will receive this as:
+
+          request.form["msg"]
+        */
+
+        formData.append("msg", message);
+
+        try {
+          // =========================
+          // CALL FLASK BACKEND
+          // =========================
+
+          const response = await fetch("/get", {
+            method: "POST",
+
+            body: formData,
+          });
+
+          // Check HTTP error
+
+          if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+          }
+
+          // =========================
+          // GET MODEL ANSWER
+          // =========================
+
+          const answer = await response.text();
+
+          // Check empty response
+
+          if (!answer.trim()) {
+            throw new Error("Model returned empty response");
+          }
+
+          // =========================
+          // DISPLAY MODEL ANSWER
+          // =========================
+
+          createBubble(answer, "bot");
+        } catch (error) {
+          console.error("Chat Error:", error);
+
+          createBubble(
+            "Unable to connect to the Finance Coach server. Please check whether your Flask server is running.",
+            "bot",
+          );
+        } finally {
+          // Stop loading
+
+          setLoading(false);
+
+          // Focus input again
+
+          inputField.focus();
+        }
+      }
+
+      // =========================
+      // LOADING STATE
+      // =========================
+
+      function setLoading(isLoading) {
+        if (isLoading) {
+          typingIndicator.classList.remove("hidden");
+
+          inputField.disabled = true;
+
+          sendButton.disabled = true;
+
+          scrollToBottom();
+        } else {
+          typingIndicator.classList.add("hidden");
+
+          inputField.disabled = false;
+
+          sendButton.disabled = false;
+        }
+      }
+
+      // =========================
+      // CREATE CHAT BUBBLE
+      // =========================
+
+      function createBubble(text, sender, save = true, savedTime = null) {
+        const messageTime = savedTime || Date.now();
+
+        const timeString = new Date(messageTime).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+
+        // Message wrapper
+
+        const wrapper = document.createElement("div");
+
+        wrapper.className =
+          sender === "user" ? "flex justify-end" : "flex justify-start";
+
+        // Message bubble
+
+        const bubble = document.createElement("div");
+
+        bubble.className = `message-bubble ${
+          sender === "user" ? "user-bubble" : "bot-bubble"
+        } px-5 py-3.5 rounded-2xl shadow-sm border border-black/5`;
+
+        // Message paragraph
+
+        const paragraph = document.createElement("p");
+
+        /*
+          whitespace-pre-wrap preserves
+          line breaks returned by the AI.
+        */
+
+        paragraph.className = "text-sm leading-relaxed whitespace-pre-wrap";
+
+        /*
+          textContent is safer than innerHTML.
+
+          The answer shown here is exactly
+          what Flask returns from your model.
+        */
+
+        paragraph.textContent = text;
+
+        // Time
+
+        const time = document.createElement("span");
+
+        time.className = "block text-[9px] mt-1 opacity-50 text-right";
+
+        time.textContent = timeString;
+
+        // Build message
+
+        bubble.appendChild(paragraph);
+
+        bubble.appendChild(time);
+
+        wrapper.appendChild(bubble);
+
+        container.appendChild(wrapper);
+
+        // =========================
+        // SAVE MESSAGE
+        // =========================
+
+        if (save) {
+          state.chatHistory.push({
+            text: text,
+
+            sender: sender,
+
+            time: messageTime,
+          });
+
+          // Keep only latest 50 messages
+
+          state.chatHistory = state.chatHistory.slice(-50);
+
+          localStorage.setItem(
+            "zenith_history",
+
+            JSON.stringify(state.chatHistory),
+          );
+        }
+
+        scrollToBottom();
+      }
+
+      // =========================
+      // AUTO SCROLL
+      // =========================
+
+      function scrollToBottom() {
+        setTimeout(function () {
+          container.scrollTo({
+            top: container.scrollHeight,
+
+            behavior: "smooth",
+          });
+        }, 50);
+      }
+
+      // =========================
+      // THEME TOGGLE
+      // =========================
+
+      function toggleTheme(force) {
+        state.isDarkMode = force !== undefined ? force : !state.isDarkMode;
+
+        document.body.classList.toggle(
+          "dark-mode",
+
+          state.isDarkMode,
+        );
+
+        document.body.classList.toggle(
+          "light-mode",
+
+          !state.isDarkMode,
+        );
+
+        document.getElementById("app-container").classList.toggle(
+          "dark",
+
+          state.isDarkMode,
+        );
+
+        updateThemeIcon();
+
+        localStorage.setItem(
+          "zenith_theme",
+
+          state.isDarkMode ? "dark" : "light",
+        );
+      }
+
+      // =========================
+      // UPDATE THEME ICON
+      // =========================
+
+      function updateThemeIcon() {
+        const icon = document.getElementById("theme-icon");
+
+        if (state.isDarkMode) {
+          icon.innerHTML = `
+
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M16.95 16.95l.707.707M7.05 7.05l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"
+            />
+
+          `;
+        } else {
+          icon.innerHTML = `
+
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+            />
+
+          `;
+        }
+      }
+
+      // =========================
+      // QUICK BUTTON
+      // =========================
+
+      function fillInput(text) {
+        inputField.value = text;
+
+        inputField.focus();
+      }
+
+      // =========================
+      // CLEAR CHAT
+      // =========================
+
+      function clearChat() {
+        const confirmation = confirm("Clear conversation history?");
+
+        if (!confirmation) {
+          return;
+        }
+
+        // Clear screen
+
+        container.innerHTML = "";
+
+        // Clear state
+
+        state.chatHistory = [];
+
+        // Clear localStorage
+
+        localStorage.removeItem("zenith_history");
+
+        // Welcome message
+
+        createBubble(
+          "Conversation cleared. Ask me any finance-related question.",
+
+          "bot",
+        );
+      }
+
+      // =========================
+      // LOAD CHAT HISTORY
+      // =========================
+
+      function loadChatHistory() {
+        // No old history
+
+        if (state.chatHistory.length === 0) {
+          createBubble(
+            "Hello! I am your Finance Coach. Ask me any finance-related question.",
+
+            "bot",
+          );
+
+          return;
+        }
+
+        // Clear container
+
+        container.innerHTML = "";
+
+        // Display saved messages
+
+        state.chatHistory.forEach(function (message) {
+          createBubble(
+            message.text,
+
+            message.sender,
+
+            false,
+
+            message.time,
+          );
+        });
+
+        scrollToBottom();
+      }
+
+      // =========================
+      // INITIALIZE APPLICATION
+      // =========================
+
+      window.addEventListener(
+        "DOMContentLoaded",
+
+        function () {
+          // Apply saved theme
+
+          toggleTheme(state.isDarkMode);
+
+          // Load previous messages
+
+          loadChatHistory();
+
+          // Focus input
+
+          inputField.focus();
+        },
+      );
+    </script>
+  </body>
+</html>
