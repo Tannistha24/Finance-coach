@@ -12,7 +12,7 @@ import os
 from src.prompt import *
 
 
-app = Flask(__name__, template_folder="templates")
+app = Flask(__name__, template_folder="template")
 
 # Load environment variables
 load_dotenv()
