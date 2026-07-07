@@ -10,4 +10,5 @@ langchain-google-genai==2.0.10
 langchain-core==0.3.66
 langchain-text-splitters==0.3.11
 protobuf==5.29.5
+python==3.11.11
 -e .
